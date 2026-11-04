@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#12160F">
+<meta name="robots" content="noindex, nofollow">
+<script>
+(function(){
+  try {
+    var m = document.querySelector('meta[name="viewport"]');
+    if (!m){
+      m = document.createElement("meta");
+      m.name = "viewport";
+      (document.head || document.documentElement).appendChild(m);
+    }
+    m.setAttribute("content", "width=device-width, initial-scale=1");
+  } catch (e) {}
+
+  // Safari opens the page horizontally offset, which reads as "cut off".
+  // Pin it to the left edge on every way in, including bfcache restores.
+  function pinLeft(){
+    try {
+      if (window.scrollX) window.scrollTo(0, window.scrollY);
+      document.documentElement.scrollLeft = 0;
+      if (document.body) document.body.scrollLeft = 0;
+    } catch (e) {}
+  }
+  ["DOMContentLoaded","load","pageshow","orientationchange","resize"].forEach(function(ev){
+    window.addEventListener(ev, pinLeft, {passive:true});
+  });
+  [0, 60, 200, 600].forEach(function(d){ setTimeout(pinLeft, d); });
+
+  // ?debug=1 -> readout of what (if anything) is wider than the screen
+  if (/[?&]debug/.test(location.search)){
+    window.addEventListener("load", function(){
+      setTimeout(function(){
+        var vv = window.visualViewport || {};
+        var wide = [];
+        document.querySelectorAll("body *").forEach(function(e){
+          var r = e.getBoundingClientRect();
+          if (r.width > 0 && (r.right > innerWidth + 0.5 || r.left < -0.5)){
+            wide.push((String(e.className).split(" ")[0] || e.tagName) +
+                      " [" + Math.round(r.left) + ".." + Math.round(r.right) + "]");
+          }
+        });
+        var d = document.createElement("div");
+        d.style.cssText = "position:fixed;left:0;right:0;bottom:0;z-index:999;background:#000;color:#0f0;" +
+          "font:11px/1.45 monospace;padding:8px;white-space:pre-wrap;max-height:45vh;overflow:auto";
+        d.textContent =
+          "inner " + innerWidth + "x" + innerHeight +
+          "  docSW " + document.documentElement.scrollWidth +
+          "  bodySW " + document.body.scrollWidth +
+          "
+scrollX " + window.scrollX +
+          "  vv.scale " + (vv.scale || "-") + "  vv.offL " + Math.round(vv.offsetLeft || 0) +
+          "  vv.w " + Math.round(vv.width || 0) +
+          "
+dpr " + window.devicePixelRatio +
+          "
+OVER EDGE (" + wide.length + "): " + (wide.slice(0, 8).join("  |  ") || "none");
+        document.body.appendChild(d);
+      }, 900);
+    });
+  }
+})();
+</script>
+<title>Nightmare Hollow Layout Banger for Backstreet Boyz by RW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+/* Dark Corner - one deliberate dark theme, every colour painted explicitly */
+:root{
+  --ground:#12160F;
+  --panel:#1B211A;
+  --panel-2:#232B21;
+  --edge:#2E3729;
+  --cream:#E9E5D6;
+  --muted:#98A288;
+  --amber:#C8912F;
+  --mag:#D94FB0;
+  --mag-dk:#9B2E7C;
+  --good:#4FB286;
+  --bad:#DB4B39;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 14px 34px -16px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+html,body{width:100%; max-width:100%; overflow-x:hidden; overflow-x:clip}
+body{
+  margin:0; background:var(--ground); color:var(--cream);
+  font-family:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- gate ---------- */
+.gate{
+  position:fixed; inset:0; z-index:200; display:grid; place-items:center;
+  background:radial-gradient(120% 100% at 50% 0%, #1D241B 0%, var(--ground) 62%);
+  padding:24px; overflow:auto;
+}
+.gate[hidden]{display:none}
+.gate form{
+  width:min(360px,100%); background:var(--panel); border:1px solid var(--edge);
+  border-radius:16px; padding:24px 24px 20px; box-shadow:var(--shadow);
+  display:flex; flex-direction:column; gap:11px; text-align:center;
+}
+.gate h1{
+  margin:0; font-family:"Chakra Petch",sans-serif; font-weight:700; font-size:20px;
+  letter-spacing:.05em; text-transform:uppercase; line-height:1.15; text-wrap:balance;
+}
+.gate h1 em{font-style:normal; color:var(--amber)}
+.gate .by{
+  margin:0 0 6px; font-family:"IBM Plex Mono",monospace; font-size:10px;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+}
+.gate label{
+  font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--muted); text-align:left;
+}
+.gate select,.gate input{
+  width:100%; appearance:none; background:var(--panel-2); color:var(--cream);
+  border:1px solid var(--edge); border-radius:9px; padding:11px 12px;
+  font-family:"Chakra Petch",sans-serif; font-weight:600; font-size:15px; letter-spacing:.04em;
+}
+.gate select{
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
+                   linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+  background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+  padding-right:34px; text-transform:uppercase;
+}
+.gate select:focus,.gate input:focus{outline:2px solid var(--amber); outline-offset:1px}
+.gate button{
+  margin-top:4px; cursor:pointer; background:var(--amber); color:#17190F;
+  border:0; border-radius:9px; padding:12px;
+  font-family:"Chakra Petch",sans-serif; font-weight:700; font-size:14px;
+  letter-spacing:.1em; text-transform:uppercase;
+}
+.gate button:hover{filter:brightness(1.08)}
+.gate button[disabled]{opacity:.5; cursor:default}
+.gate .err{
+  margin:0; min-height:15px; font-family:"IBM Plex Mono",monospace; font-size:11px;
+  color:var(--bad); letter-spacing:.04em;
+}
+
+/* ---------- header ---------- */
+.bar{
+  display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px;
+  padding:7px 10px 6px; background:var(--panel); max-width:100%;
+  border-bottom:1px solid var(--edge); box-shadow:inset 0 -1px 0 rgba(200,145,47,.3);
+}
+.bar > *{flex:0 0 auto}
+.brand{display:flex; flex-direction:column; gap:3px; margin-right:auto; min-width:0; flex:1 1 140px}
+.brand h1{
+  font-family:"Chakra Petch",sans-serif; font-weight:700; font-size:clamp(16px,2vw,22px);
+  letter-spacing:.04em; text-transform:uppercase; margin:0; line-height:1;
+}
+.brand h1 em{font-style:normal; color:var(--mag)}
+.brand p{
+  margin:0; font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10px; letter-spacing:.13em; text-transform:uppercase; color:var(--muted);
+}
+.brand p b{color:var(--amber); font-weight:600}
+.modes{display:flex; border:1px solid var(--edge); border-radius:10px; overflow:hidden; background:var(--panel-2)}
+.modes button{
+  appearance:none; border:0; background:transparent; cursor:pointer;
+  font-family:"Chakra Petch",sans-serif; font-weight:600; font-size:13px;
+  letter-spacing:.07em; text-transform:uppercase; color:var(--muted);
+  padding:9px 15px; transition:background .16s, color .16s;
+}
+.modes button + button{border-left:1px solid var(--edge)}
+.modes button:hover{color:var(--cream); background:rgba(200,145,47,.12)}
+.modes button[aria-pressed="true"]{background:var(--amber); color:#17190F}
+.stats{display:flex; gap:16px; font-family:"IBM Plex Mono",ui-monospace,monospace}
+.stat{display:flex; flex-direction:column; gap:2px; min-width:48px}
+.stat[hidden]{display:none}
+.stat b{font-size:18px; font-weight:600; line-height:1; font-variant-numeric:tabular-nums}
+.stat span{font-size:9px; letter-spacing:.11em; text-transform:uppercase; color:var(--muted)}
+.stat.miss b{color:var(--bad)}
+.restart{
+  position:absolute; top:6px; right:8px; z-index:2;
+  display:flex; align-items:center; gap:4px; cursor:pointer;
+  background:rgba(0,0,0,.28); border:1px solid rgba(200,145,47,.45); border-radius:9px;
+  padding:5px 9px; color:var(--amber);
+  font-family:"Chakra Petch",sans-serif; font-weight:600; font-size:11px;
+  letter-spacing:.06em; text-transform:uppercase;
+  transition:color .16s, border-color .16s, background .16s;
+}
+.restart span{font-size:13px; line-height:1}
+.restart:hover,.restart:focus-visible{color:var(--cream); border-color:var(--amber); background:rgba(0,0,0,.5)}
+.me-chip{
+  display:flex; align-items:center; background:var(--panel-2);
+  border:1px solid var(--edge); border-radius:10px; padding:7px 11px;
+}
+.me-chip b{
+  font-family:"Chakra Petch",sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.05em; text-transform:uppercase; color:var(--amber);
+}
+
+/* ---------- layout ---------- */
+.wrap{
+  display:grid; grid-template-columns:minmax(0,1fr) 280px;
+  grid-template-areas:"sheet callout" "sheet rail";
+  grid-template-rows:auto 1fr;
+  gap:14px 16px; padding:14px 18px 22px; align-items:start;
+}
+.sheet{grid-area:sheet; min-width:0}
+.callout{grid-area:callout; min-width:0}
+.rail{grid-area:rail; min-width:0}
+@media (max-width:1000px){
+  .wrap{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"callout" "sheet" "rail";
+    grid-template-rows:auto auto auto; padding:10px 10px 18px;
+  }
+}
+
+/* ---------- the board ---------- */
+.sheet{
+  position:relative; background:#FFFFFF; border:1px solid var(--edge);
+  border-radius:12px; padding:6px 6px 2px; box-shadow:var(--shadow);
+  min-width:0; max-width:100%; overflow:hidden;
+}
+/* The height cap MUST live on a parent: padding-bottom:% on .field-wrap
+   resolves against its PARENT's width, so capping .field-wrap itself shrank
+   the box but not its height, and the bottom row of bunkers stayed under the
+   fold. svh second so old Safari keeps the vh value. */
+.field-cap{
+  width:100%; margin:0 auto;
+  max-width:min(100%, max(240px, calc((100vh - 212px) / 1.2368)));
+  max-width:min(100%, max(240px, calc((100svh - 212px) / 1.2368)));
+}
+.field-wrap{
+  position:relative; width:100%; margin:0 auto;
+  padding-bottom:123.68%;           /* 940 / 760 - this layout is PORTRAIT */
+  overflow:hidden; border-radius:8px;
+}
+.field{
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  display:block; touch-action:manipulation;   /* taps only - a stray pinch used to leave the board zoomed and panned */
+}
+.sheet-foot{
+  display:flex; justify-content:flex-end; padding:2px 6px 4px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:#8494A6;
+}
+
+/* name slots sit exactly over the layout's printed callouts */
+.slot rect{
+  fill:#FFFFFF; stroke:#8B9AAC; stroke-width:1.8; stroke-dasharray:6 5;
+  transition:stroke .18s, stroke-width .18s, fill .18s;
+}
+.slot text{
+  font-family:"IBM Plex Sans","Segoe UI",sans-serif; font-size:21px; font-weight:600;
+  fill:#101D2B; opacity:0; transition:opacity .22s;
+}
+.slot.named rect{stroke:#9B2E7C; stroke-width:1.8; stroke-dasharray:none}
+.slot.named text{opacity:1}
+.hit{fill:transparent; stroke:none; cursor:pointer}
+.tgt:focus{outline:none}
+.tgt:focus-visible .hit{stroke:#D94FB0; stroke-width:2.5; stroke-dasharray:5 4}
+
+/* ---------- scoreboard, directly under the field ---------- */
+.board{
+  width:min(640px,100%); margin:8px auto 5px;
+  background:var(--panel); border:1px solid var(--edge); border-radius:11px;
+  padding:11px 13px 10px; box-shadow:0 6px 18px -10px rgba(16,29,43,.5);
+}
+.board-head{
+  display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+  margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--edge);
+}
+.board-head b{
+  font-family:"Chakra Petch",sans-serif; font-weight:700; font-size:12px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--cream);
+}
+.board-head span{
+  font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--amber); white-space:nowrap;
+}
+.board-best{
+  display:flex; align-items:baseline; gap:9px; flex-wrap:wrap;
+  margin:0 0 9px; padding:7px 9px; border-radius:8px;
+  background:rgba(200,145,47,.1); border:1px solid rgba(200,145,47,.32);
+}
+.board-best span{
+  font-family:"IBM Plex Mono",monospace; font-size:8.5px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--muted);
+}
+.board-best b{
+  font-family:"IBM Plex Mono",monospace; font-size:19px; font-weight:600;
+  color:var(--amber); font-variant-numeric:tabular-nums; line-height:1;
+}
+.board-best em{
+  font-style:normal; font-family:"Chakra Petch",sans-serif; font-weight:700;
+  font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--cream);
+}
+.board-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(124px,1fr)); gap:8px 14px}
+.row{display:flex; flex-direction:column; gap:3px; min-width:0}
+.row .top{display:flex; align-items:baseline; justify-content:space-between; gap:6px}
+.row .nm{
+  flex:1 1 auto; min-width:4.2em;
+  font-family:"Chakra Petch",sans-serif; font-weight:600; font-size:11.5px;
+  letter-spacing:.03em; text-transform:uppercase; color:var(--muted);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.row .ct{
+  flex:0 1 auto; min-width:0; overflow:hidden;
+  font-family:"IBM Plex Mono",monospace; font-size:9.5px; font-weight:600;
+  color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.pips{display:flex; gap:2px}
+.pips i{flex:1 1 0; height:5px; border-radius:1px; background:#161B13; border:1px solid rgba(200,145,47,.16)}
+.pips i.on{background:var(--amber); border-color:var(--amber)}
+.row .donebar{
+  font-family:"Chakra Petch",sans-serif; font-weight:700; font-size:8.5px;
+  letter-spacing:.16em; text-transform:uppercase; color:#0E1A13;
+  background:var(--good); border-radius:2px; text-align:center; line-height:1.7;
+}
+.row.me .nm{color:var(--cream)}
+.row.me .ct{color:var(--amber)}
+.row.finished .nm{color:var(--good)}
+.row.finished .ct{color:var(--good)}
+.board-foot{
+  margin-top:8px; padding-top:6px; border-top:1px solid var(--edge);
+  display:flex; align-items:center; gap:6px;
+  font-family:"IBM Plex Mono",monospace; font-size:8.5px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted);
+}
+.offline-note{
+  margin:8px 0 0; padding:8px 9px; border-radius:8px;
+  background:rgba(219,75,57,.12); border:1px solid rgba(219,75,57,.4);
+  font-family:"IBM Plex Sans",sans-serif; font-size:11.5px; line-height:1.5; color:var(--cream);
+}
+.offline-note[hidden]{display:none}
+.board-foot i{width:6px; height:6px; border-radius:50%; background:var(--muted); flex:none}
+.board-foot.live i{background:var(--good)}
+.board-foot.off i{background:var(--bad)}
+
+/* ---------- blitz callout: top right, under the stats ---------- */
+.callout{
+  display:none; flex-direction:column; gap:3px; align-items:center;
+  background:linear-gradient(180deg,#26301F,#1A2018);
+  border:1px solid rgba(200,145,47,.4); border-radius:14px;
+  padding:8px 14px 7px; box-shadow:var(--shadow); position:relative;
+}
+.callout[data-show="1"]{display:flex}
+.callout span{
+  font-family:"IBM Plex Mono",monospace; font-size:9px; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--amber);
+}
+.callout strong{
+  font-family:"Chakra Petch",sans-serif; font-weight:700;
+  font-size:clamp(30px,5vw,42px); letter-spacing:.04em; text-transform:uppercase;
+  color:var(--cream); line-height:1; text-align:center;
+}
+.callout small{font-family:"IBM Plex Mono",monospace; font-size:10.5px; color:var(--muted)}
+
+/* ---------- rail ---------- */
+.rail{display:flex; flex-direction:column; gap:12px}
+.card{background:var(--panel); border:1px solid var(--edge); border-radius:14px; padding:13px}
+.card[hidden]{display:none}
+.card h2{
+  margin:0 0 10px; font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:9.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+}
+.modes button:focus-visible,.btn:focus-visible{outline:2px solid var(--amber); outline-offset:2px}
+.btns{display:flex; gap:8px; flex-wrap:wrap}
+.btn{
+  appearance:none; cursor:pointer; flex:1 1 auto;
+  background:var(--panel-2); border:1px solid var(--edge); border-radius:8px;
+  padding:9px 12px; color:var(--cream);
+  font-family:"Chakra Petch",sans-serif; font-weight:600; font-size:12.5px;
+  letter-spacing:.07em; text-transform:uppercase; transition:border-color .14s, background .14s;
+}
+.btn:hover{border-color:var(--amber)}
+.btn[hidden]{display:none}
+.btn.primary{background:var(--amber); border-color:var(--amber); color:#17190F}
+.btn.primary:hover{filter:brightness(1.08)}
+
+/* ---------- finish ---------- */
+.done{
+  position:absolute; inset:0; display:none; place-items:center;
+  background:rgba(18,22,15,.8); backdrop-filter:blur(3px); border-radius:10px; z-index:30; padding:14px;
+}
+.done[data-show="1"]{display:grid}
+.done-card{
+  background:var(--panel); border:1px solid var(--edge); border-radius:14px; color:var(--cream);
+  padding:20px 24px; text-align:center; box-shadow:var(--shadow); max-width:340px;
+}
+.done-card h3{margin:0 0 4px; font-family:"Chakra Petch",sans-serif; font-weight:700; font-size:23px; letter-spacing:.05em; text-transform:uppercase}
+.done-card h3.won{color:var(--good)}
+.done-card p{margin:0 0 14px; color:var(--muted); font-size:13px; line-height:1.5}
+.score{display:flex; justify-content:center; gap:20px; margin:0 0 15px; font-family:"IBM Plex Mono",monospace}
+.score div{display:flex; flex-direction:column; gap:2px}
+.score b{font-size:21px; font-weight:600; font-variant-numeric:tabular-nums}
+.score b.ok{color:var(--good)}
+.score span{font-size:9px; letter-spacing:.11em; text-transform:uppercase; color:var(--muted)}
+.workon{
+  margin:0 0 14px; padding:9px 10px; border-radius:8px; text-align:left;
+  background:rgba(219,75,57,.12); border:1px solid rgba(219,75,57,.4);
+  font-family:"IBM Plex Mono",monospace; font-size:11px; line-height:1.7; color:var(--muted);
+}
+.workon[hidden]{display:none}
+.workon em{
+  font-style:normal; font-size:8.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--bad); display:block; margin-bottom:4px;
+}
+.workon b{
+  font-family:"Chakra Petch",sans-serif; font-weight:700; font-size:12.5px;
+  letter-spacing:.05em; text-transform:uppercase; color:var(--cream);
+}
+
+@media (max-width:760px){
+  /* explicit grid: three fixed rows, so nothing can ever push past the edge */
+  .bar{
+    display:grid; gap:7px 9px;
+    padding:8px max(10px, env(safe-area-inset-right)) 8px max(10px, env(safe-area-inset-left));
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:"brand brand" "modes chip" "stats stats";
+  }
+  .bar > *{min-width:0}
+  .brand{grid-area:brand}
+  .brand h1{font-size:15px}
+  .brand p{display:none}
+  .modes{grid-area:modes; justify-self:stretch}
+  .modes button{flex:1 1 0; padding:8px 6px; font-size:12px}
+  .me-chip{grid-area:chip; justify-self:end; padding:6px 9px; max-width:40vw}
+  .me-chip b{font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .stats{grid-area:stats; gap:8px; justify-content:space-between}
+  .stat{min-width:0; flex:1 1 0}
+  .stat b{font-size:15px}
+  .stat span{font-size:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .wrap{gap:10px; padding:8px max(8px, env(safe-area-inset-right)) 16px max(8px, env(safe-area-inset-left))}
+  .sheet{padding:4px 4px 0; border-radius:10px}
+  /* in blitz the called name must stay put while you hunt the board */
+  .callout{position:sticky; top:0; z-index:40; padding:9px 12px; border-radius:11px}
+  .restart{top:5px; right:6px; padding:4px 7px; font-size:10px}
+  .callout span{font-size:8px}
+  .callout strong{font-size:clamp(24px,9vw,36px)}
+  .callout small{font-size:9.5px}
+  .board{padding:8px 9px 7px; margin:6px auto 4px}
+  .board-head b{font-size:10.5px}
+  .board-head span{font-size:8.5px}
+  .board-best{padding:6px 8px; margin-bottom:7px}
+  .board-best b{font-size:16px}
+  .board-grid{grid-template-columns:1fr 1fr; gap:6px 10px}
+  .row .nm{font-size:10.5px}
+  .row .ct{font-size:9px}
+  .card{padding:10px}
+  .done-card{padding:14px 15px}
+  .done-card h3{font-size:18px}
+  .score{gap:12px}
+  .score b{font-size:17px}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important; transition-duration:.01ms !important}}
+</style>
+</head>
+<body>
+
+
+<div class="gate" id="gate">
+  <form id="gate-form">
+    <h1>Nightmare <em>Hollow</em> Layout Banger</h1>
+    <p class="by">for Backstreet Boyz by RW</p>
+    <label for="who">Shooter</label>
+    <select id="who"></select>
+    <label for="pw">Password</label>
+    <input type="password" id="pw" autocomplete="current-password">
+    <button type="submit" id="gate-go">Enter the field</button>
+    <p class="err" id="gate-err"></p>
+  </form>
+</div>
+
+<header class="bar">
+  <div class="brand">
+    <h1>Nightmare <em>Hollow</em> Layout Banger</h1>
+    <p>for Backstreet Boyz by RW &middot; <b>Blitz: <span id="goal-head">10 perfect runs under 1:00</span></b></p>
+  </div>
+  <div class="modes" role="group" aria-label="Mode">
+    <button type="button" data-mode="study" aria-pressed="true">Study</button>
+    <button type="button" data-mode="blitz" aria-pressed="false">Blitz</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="s-placed">0/22</b><span>Named</span></div>
+    <div class="stat miss"><b id="s-miss">0</b><span>Misses</span></div>
+    <div class="stat" id="stat-time"><b id="s-time">0:00</b><span>Time</span></div>
+  </div>
+  <div class="me-chip"><b id="me-name">&mdash;</b></div>
+</header>
+
+<div class="wrap">
+  <div class="callout" id="callout">
+    <button type="button" class="restart" id="btn-restart" title="Start this run over">
+      <span aria-hidden="true">&#8635;</span> Restart
+    </button>
+    <span>Call the spot</span>
+    <strong id="callout-name">&mdash;</strong>
+    <small id="callout-meta">streak 0</small>
+  </div>
+
+  <div class="sheet">
+    <div class="field-cap">
+    <div class="field-wrap">
+      <svg class="field" id="field" viewBox="0 0 760 940" role="application"
+           aria-label="Nightmare Hollow field layout. Tap the spot that is called."></svg>
+      <div class="done" id="done">
+        <div class="done-card">
+          <h3 id="done-title">Field clear</h3>
+          <p id="done-sub">Every spot named.</p>
+          <div class="score">
+            <div><b id="done-time">0:00</b><span>Time</span></div>
+            <div><b id="done-miss">0</b><span>Misses</span></div>
+            <div><b id="done-prog">0/10</b><span>Clean runs</span></div>
+          </div>
+          <p class="workon" id="done-workon" hidden></p>
+          <div class="btns">
+            <button type="button" class="btn primary" data-again>Run it again</button>
+            <button type="button" class="btn" data-study>Study mode</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div class="board">
+      <div class="board-head">
+        <b>Perfect blitz runs &middot; under <span id="goal-limit">1:00</span></b>
+        <span id="board-days"></span>
+      </div>
+      <div class="board-best">
+        <span>Fastest run</span>
+        <b id="best-time">&mdash;</b>
+        <em id="best-who">no runs yet</em>
+      </div>
+      <div class="board-grid" id="board-grid"></div>
+      <div class="board-foot" id="board-foot"><i></i><span id="board-sync">connecting</span></div>
+      <p class="offline-note" id="offline-note" hidden>
+        Can&rsquo;t reach the scoreboard, so runs won&rsquo;t be saved. Practice still works.
+        If you opened this from a claude.ai link, use the GitHub link instead.
+      </p>
+    </div>
+
+    <div class="sheet-foot">Bubba&rsquo;s 3-Man &middot; Nightmare Hollow</div>
+  </div>
+
+  <aside class="rail">
+    <div class="card">
+      <h2>Controls</h2>
+      <div class="btns">
+        <button type="button" class="btn" id="btn-reset">Reset</button>
+        <button type="button" class="btn" id="btn-logout">Log out</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var TARGETS = [
+  {n:"S1",d:"S1",lx:597.2,ly:251.5,lw:25.2,lh:21,hx:573.2,hy:263.0,r:21.0},
+  {n:"S1",d:"S1",lx:597.2,ly:665.5,lw:25.2,lh:21,hx:573.2,hy:677.0,r:21.0},
+  {n:"S2",d:"S2",lx:654.2,ly:325.9,lw:25.2,lh:21,hx:630.2,hy:337.4,r:21.0},
+  {n:"S2",d:"S2",lx:654.2,ly:591.1,lw:25.2,lh:21,hx:630.2,hy:602.6,r:21.0},
+  {n:"S3",d:"S3",lx:648.2,ly:412.3,lw:25.2,lh:21,hx:624.2,hy:423.8,r:17},
+  {n:"S3",d:"S3",lx:648.2,ly:504.7,lw:25.2,lh:21,hx:624.2,hy:516.2,r:17},
+  {n:"MONEY",d:"Money",lx:429.8,ly:354.1,lw:63.0,lh:21,hx:525.8,hy:365.6,r:26},
+  {n:"MONEY",d:"Money",lx:429.8,ly:562.9,lw:63.0,lh:21,hx:525.8,hy:574.4,r:26},
+  {n:"SNAKE CORNER",d:"Snake Corner",lx:524.0,ly:208.9,lw:151.2,lh:21,hx:503.0,hy:220.4,r:19},
+  {n:"SNAKE CORNER",d:"Snake Corner",lx:524.0,ly:708.1,lw:151.2,lh:21,hx:503.0,hy:719.6,r:19},
+  {n:"D CORNER",d:"D Corner",lx:287.0,ly:225.1,lw:100.8,lh:21,hx:257.0,hy:236.6,r:26},
+  {n:"D CORNER",d:"D Corner",lx:287.0,ly:691.9,lw:100.8,lh:21,hx:257.0,hy:703.4,r:26},
+  {n:"HOME",d:"Home",lx:405.8,ly:291.1,lw:50.4,lh:21,hx:378.8,hy:302.6,r:24.0},
+  {n:"HOME",d:"Home",lx:405.8,ly:625.9,lw:50.4,lh:21,hx:378.8,hy:637.4,r:24.0},
+  {n:"CAN",d:"Can",lx:275.3,ly:348.1,lw:37.8,lh:21,hx:255.8,hy:359.6,r:19},
+  {n:"CAN",d:"Can",lx:275.3,ly:568.9,lw:37.8,lh:21,hx:255.8,hy:580.4,r:19},
+  {n:"D2",d:"D2",lx:207.8,ly:400.9,lw:25.2,lh:21,hx:183.8,hy:412.4,r:21.0},
+  {n:"D2",d:"D2",lx:207.8,ly:516.1,lw:25.2,lh:21,hx:183.8,hy:527.6,r:21.0},
+  {n:"D1",d:"D1",lx:191.6,ly:317.5,lw:25.2,lh:21,hx:167.6,hy:329.0,r:21.0},
+  {n:"D1",d:"D1",lx:191.6,ly:599.5,lw:25.2,lh:21,hx:167.6,hy:611.0,r:21.0},
+  {n:"COWBOY",d:"Cowboy",lx:431.0,ly:458.5,lw:75.6,lh:21,hx:380.0,hy:470.0,r:26},
+  {n:"S50",d:"S50",lx:642.2,ly:458.5,lw:37.8,lh:21,hx:624.2,hy:470.0,r:15},
+];
+var PX_PER_FT = 6;   // drawn layout px per field foot
+
+var LAYOUT = "data:image/png;base64,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";
+var API    = "https://opfxjmqscafxfnavjbfa.supabase.co/functions/v1/drill";
+var BOARD  = "backstreet";   /* this page is one board on a shared endpoint */
+
+var USERS   = ["Bretton","Cayden","TJ","Robert"];
+var GOAL    = 10;
+var LIMIT   = 45;              /* seconds - a run only counts under this */
+var TOURNEY = "2026-11-08";   /* Bubba's date - blank hides the countdown */
+/* every human-facing "under 1:00" / "10/17" comes from these two, never a literal */
+var LIMIT_TXT = Math.floor(LIMIT/60) + ":" + ("0" + (LIMIT%60)).slice(-2);
+var TDATE     = new Date((TOURNEY || "2000-01-01") + "T00:00:00");
+var TOURNEY_TXT = (TDATE.getMonth()+1) + "/" + TDATE.getDate();
+var NORECORD = [];            /* no test accounts on this board */     /* still on the board, never holds fastest run */
+var LS_USER = "bb3_user", LS_PW = "bb3_pw", LS_SCORES = "bb3_scores";
+
+TARGETS.forEach(function(t, i){ t.id = "t" + i; });
+(function(){
+  var a = document.getElementById("goal-limit"); if (a) a.textContent = LIMIT_TXT;
+  var b = document.getElementById("goal-head");
+  if (b) b.textContent = GOAL + " perfect runs under " + LIMIT_TXT;
+})();
+var NAMES = [];
+TARGETS.forEach(function(t){ if (NAMES.indexOf(t.n) < 0) NAMES.push(t.n); });
+var TOTAL = TARGETS.length;
+
+var st = {mode:"study", filled:{}, miss:0, tries:0, start:0, streak:0, best:0, prompt:null, missed:{}};
+var me = null, pw = null;
+var scores = {};
+var online = false;
+
+var svg = document.getElementById("field");
+var NS = "http://www.w3.org/2000/svg";
+var nodes = {}, slots = {};
+var tick = null;
+
+function el(tag, attrs){
+  var n = document.createElementNS(NS, tag);
+  for (var k in attrs) n.setAttribute(k, attrs[k]);
+  return n;
+}
+function fmt(ms){
+  var s = Math.max(0, Math.floor(ms/1000));
+  return Math.floor(s/60) + ":" + ("0" + (s%60)).slice(-2);
+}
+function ls(k, v){
+  try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); }
+  catch (e) { return null; }
+}
+
+/* ---------------- scores ---------------- */
+function blank(){
+  var o = {};
+  USERS.forEach(function(u){ o[u] = {n:0, best:0}; });
+  return o;
+}
+function normalise(raw){
+  var o = blank();
+  if (raw && typeof raw === "object"){
+    USERS.forEach(function(u){
+      var r = raw[u];
+      if (!r) return;
+      o[u].n = Math.max(0, Math.min(999, parseInt(r.n, 10) || 0));
+      o[u].best = Math.max(0, parseInt(r.best, 10) || 0);
+    });
+  }
+  return o;
+}
+function cacheScores(){ ls(LS_SCORES, JSON.stringify(scores)); }
+function offlineBanner(show){
+  var b = document.getElementById("offline-note");
+  if (b) b.hidden = !show;
+}
+function syncNote(state, text){
+  offlineBanner(state === "off");
+  var f = document.getElementById("board-foot");
+  f.className = "board-foot" + (state === "live" ? " live" : state === "off" ? " off" : "");
+  document.getElementById("board-sync").textContent = text;
+}
+
+/* one call for everything the server does */
+function call(action, extra){
+  var body = {board:BOARD, action:action, shooter:me, password:pw};
+  for (var k in (extra||{})) body[k] = extra[k];
+  return fetch(API, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body)
+  }).then(function(r){
+    return r.json().then(function(j){ j._status = r.status; return j; });
+  });
+}
+function applyBoard(j){
+  if (j && j.board){
+    scores = normalise(j.board);
+    cacheScores();
+    online = true;
+    syncNote("live", "shared board");
+  }
+  renderBoard();
+}
+function refresh(){
+  if (!me) return;
+  call("board").then(applyBoard).catch(function(){
+    online = false;
+    syncNote("off", "offline - showing last seen");
+    renderBoard();
+  });
+}
+
+function daysLeft(){
+  var t = new Date(TOURNEY + "T00:00:00");
+  var now = new Date();
+  var d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((t - d0) / 86400000);
+}
+function renderBoard(){
+  if (!TOURNEY){ document.getElementById("board-days").textContent = ""; }
+  var d = TOURNEY ? daysLeft() : NaN;
+  if (TOURNEY) document.getElementById("board-days").textContent =
+    d > 1 ? d + " days to " + TOURNEY_TXT
+          : (d === 1 ? "1 day to " + TOURNEY_TXT
+          : (d === 0 ? TOURNEY_TXT + " - game day" : TOURNEY_TXT + " is past"));
+
+  var champ = null;
+  USERS.forEach(function(u){
+    if (NORECORD.indexOf(u) >= 0) return;
+    var b = scores[u] && scores[u].best;
+    if (b && (!champ || b < champ.t)) champ = {u:u, t:b};
+  });
+  document.getElementById("best-time").textContent = champ ? fmt(champ.t * 1000) : "—";
+  document.getElementById("best-who").textContent = champ ? champ.u : "no runs yet";
+
+  var grid = document.getElementById("board-grid");
+  grid.innerHTML = "";
+  USERS.forEach(function(u){
+    var s = scores[u] || {n:0, best:0};
+    var done = s.n >= GOAL;
+    var row = document.createElement("div");
+    row.className = "row" + (u === me ? " me" : "") + (done ? " finished" : "");
+    var best = s.best ? fmt(s.best * 1000) : "";
+    if (done){
+      row.innerHTML =
+        '<div class="top"><span class="nm">' + u + '</span>' +
+        '<span class="ct">' + best + "</span></div>" +
+        '<div class="donebar">&#10003; Complete &middot; ' + s.n + ' runs</div>';
+    } else {
+      var pips = "";
+      for (var i = 0; i < GOAL; i++) pips += '<i class="' + (i < s.n ? "on" : "") + '"></i>';
+      row.innerHTML =
+        '<div class="top"><span class="nm">' + u + '</span>' +
+        '<span class="ct">' + s.n + "/" + GOAL + (best ? " &middot; " + best : "") + "</span></div>" +
+        '<div class="pips">' + pips + "</div>";
+    }
+    grid.appendChild(row);
+  });
+}
+
+/* ---------------- board ---------------- */
+function drawBoard(){
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  var img = el("image", {x:0, y:0, width:760, height:940, preserveAspectRatio:"xMidYMid meet"});
+  img.setAttributeNS("http://www.w3.org/1999/xlink", "href", LAYOUT);
+  img.setAttribute("href", LAYOUT);
+  svg.appendChild(img);
+
+  nodes = {}; slots = {};
+  TARGETS.forEach(function(t){
+    var g = el("g", {"class":"tgt", tabindex:"0", role:"button", "data-id":t.id});
+    g.setAttribute("aria-label", t.d + " position");
+    g.appendChild(el("circle", {cx:t.hx, cy:t.hy, r:t.r, "class":"hit"}));
+    svg.appendChild(g);
+    nodes[t.id] = g;
+
+    var pad = 5;
+    var s = el("g", {"class":"slot", "data-id":t.id});
+    s.appendChild(el("rect", {x:t.lx - pad, y:t.ly - pad - 1,
+                              width:t.lw + pad*2, height:t.lh + pad*2 + 2, rx:4}));
+    var tx = el("text", {x:t.lx + t.lw/2, y:t.ly + t.lh/2 + 1,
+                         "text-anchor":"middle", "dominant-baseline":"middle"});
+    tx.textContent = t.d;
+    s.appendChild(tx);
+    svg.appendChild(s);
+    slots[t.id] = s;
+  });
+}
+function paint(){
+  TARGETS.forEach(function(t){
+    slots[t.id].classList.toggle("named", (st.mode === "study") || !!st.filled[t.id]);
+  });
+}
+function placedCount(){ return Object.keys(st.filled).length; }
+function stats(){
+  document.getElementById("s-placed").textContent =
+    (st.mode === "study" ? TOTAL : placedCount()) + "/" + TOTAL;
+  document.getElementById("s-miss").textContent = st.miss;
+  document.getElementById("s-time").textContent = st.start ? fmt(Date.now() - st.start) : "0:00";
+}
+
+function fill(t){
+  st.filled[t.id] = true;
+  var s = slots[t.id];
+  s.classList.add("named", "flash");
+  setTimeout(function(){ s.classList.remove("flash"); }, 380);
+  st.streak++; st.best = Math.max(st.best, st.streak);
+  stats();
+  if (placedCount() === TOTAL) finish();
+  else if (st.mode === "blitz") nextPrompt();
+}
+function miss(t){
+  st.miss++;
+  st.streak = 0;
+  if (st.prompt) st.missed[st.prompt] = (st.missed[st.prompt] || 0) + 1;
+  if (t){
+    var s = slots[t.id];
+    s.classList.add("wrong");
+    setTimeout(function(){ s.classList.remove("wrong"); }, 380);
+  }
+  stats();
+  setCalloutMeta();
+}
+function attempt(name, t){
+  if (!name || !t) return;
+  st.tries++;
+  if (st.filled[t.id]){
+    slots[t.id].classList.add("shakeit");
+    setTimeout(function(){ slots[t.id].classList.remove("shakeit"); }, 380);
+    return;
+  }
+  if (t.n === name) fill(t); else miss(t);
+}
+function byId(id){
+  for (var i = 0; i < TARGETS.length; i++) if (TARGETS[i].id === id) return TARGETS[i];
+  return null;
+}
+function nearest(x, y){
+  var best = null, bd = Infinity;
+  TARGETS.forEach(function(t){
+    if (st.filled[t.id]) return;
+    var d = Math.sqrt((t.hx-x)*(t.hx-x) + (t.hy-y)*(t.hy-y));
+    if (d <= t.r + 14 && d < bd){ bd = d; best = t; }
+  });
+  return best;
+}
+function toBoard(cx, cy){
+  var p = svg.createSVGPoint(); p.x = cx; p.y = cy;
+  var m = svg.getScreenCTM();
+  return m ? p.matrixTransform(m.inverse()) : null;
+}
+function highlight(hit){
+  TARGETS.forEach(function(t){ slots[t.id].classList.toggle("hot", !!hit && hit.id === t.id); });
+}
+
+function onBoard(e){
+  var g = e.target.closest(".tgt, .slot");
+
+  if (st.mode !== "blitz" || !st.prompt) return;
+  var t = g ? byId(g.dataset.id) : null;
+  if (!t){
+    var f = toBoard(e.clientX, e.clientY);
+    t = f ? nearest(f.x, f.y) : null;
+  }
+  if (t) attempt(st.prompt, t);
+}
+svg.addEventListener("click", onBoard);
+svg.addEventListener("keydown", function(e){
+  if (e.key === "Enter" || e.key === " "){ e.preventDefault(); onBoard(e); }
+});
+
+/* ---------------- blitz ---------------- */
+function nextPrompt(){
+  var open = TARGETS.filter(function(t){ return !st.filled[t.id]; });
+  if (!open.length) return;
+  st.prompt = open[Math.floor(Math.random()*open.length)].n;
+  document.getElementById("callout-name").textContent = st.prompt;
+  setCalloutMeta();
+}
+function setCalloutMeta(){
+  document.getElementById("callout-meta").textContent =
+    "streak " + st.streak + "  ·  " + (TOTAL - placedCount()) + " left";
+}
+
+/* ---------------- finish ---------------- */
+function finish(){
+  clearInterval(tick); tick = null;
+  var ms = st.start ? Date.now() - st.start : 0;
+  var secs = Math.round(ms/1000);
+  var isBlitz = (st.mode === "blitz");
+  var perfect = st.miss === 0;
+  var inTime  = secs < LIMIT;
+  var qualifies = isBlitz && perfect && inTime;
+
+  var mine = (scores[me] ? scores[me].n : 0);
+  var timeEl = document.getElementById("done-time");
+  timeEl.textContent = isBlitz ? fmt(ms) : "—";
+  timeEl.className = qualifies ? "ok" : "";
+  document.getElementById("done-miss").textContent = st.miss;
+  document.getElementById("done-prog").textContent = mine + "/" + GOAL;
+
+  var h3 = document.getElementById("done-title");
+  h3.textContent = qualifies ? "Banger" : (isBlitz ? "No good" : "Field clear");
+  h3.className = qualifies ? "won" : "";
+
+  var sub;
+  if (!isBlitz) sub = "All " + TOTAL + " named. Blitz is the one that counts.";
+  else if (qualifies) sub = "Logging it…";
+  else if (!perfect && !inTime) sub = st.miss + " missed and over time. Needs to be clean and under " + LIMIT_TXT + ".";
+  else if (!perfect) sub = st.miss + (st.miss === 1 ? " miss" : " misses") + " - a run only counts if it is perfect.";
+  else sub = "Clean, but " + fmt(ms) + " is over " + LIMIT_TXT + ". Go again.";
+  document.getElementById("done-sub").textContent = sub;
+
+  var wo = document.getElementById("done-workon");
+  var missedNames = Object.keys(st.missed);
+  if (missedNames.length){
+    missedNames.sort(function(a, b){ return st.missed[b] - st.missed[a]; });
+    wo.innerHTML = "<em>Work on these</em>" + missedNames.map(function(n){
+      return "<b>" + n + "</b>" + (st.missed[n] > 1 ? " &times;" + st.missed[n] : "");
+    }).join(",&nbsp; ");
+    wo.hidden = false;
+  } else {
+    wo.hidden = true;
+  }
+
+  document.getElementById("done").dataset.show = "1";
+
+  if (!qualifies) return;
+
+  call("record", {secs:secs}).then(function(j){
+    applyBoard(j);
+    var got = (scores[me] ? scores[me].n : 0);
+    document.getElementById("done-prog").textContent = got + "/" + GOAL;
+    if (j && j.counted){
+      document.getElementById("done-sub").textContent = got >= GOAL
+        ? "That is all " + GOAL + " clean runs. Ready for Bubba's."
+        : "Counted. " + (GOAL - got) + " more perfect runs under " + LIMIT_TXT
+            + (TOURNEY ? " before " + TOURNEY_TXT : "") + ".";
+    } else {
+      document.getElementById("done-sub").textContent =
+        j && j.reason === "too_soon" ? "Logged too fast after the last one - give it 20 seconds."
+                                     : "That time did not look real, so it was not counted.";
+      document.getElementById("done-title").textContent = "Not counted";
+      document.getElementById("done-title").className = "";
+    }
+  }).catch(function(){
+    online = false;
+    syncNote("off", "offline - run not saved");
+    document.getElementById("done-sub").textContent =
+      "Clean run, but the scoreboard is unreachable. Try again when you have signal.";
+  });
+}
+
+/* ---------------- modes ---------------- */
+function setMode(m){
+  st.mode = m;
+  st.filled = {}; st.miss = 0; st.tries = 0; st.missed = {};
+  st.streak = 0; st.best = 0; st.prompt = null;
+  st.start = (m === "blitz") ? Date.now() : 0;
+  document.getElementById("done").dataset.show = "0";
+  document.getElementById("done-workon").hidden = true;
+  clearInterval(tick); tick = null;
+  if (m === "blitz") tick = setInterval(stats, 500);
+  document.getElementById("stat-time").hidden = (m !== "blitz");
+
+  document.querySelectorAll(".modes button").forEach(function(b){
+    b.setAttribute("aria-pressed", b.dataset.mode === m ? "true" : "false");
+  });
+  document.getElementById("callout").dataset.show = (m === "blitz") ? "1" : "0";
+  if (m === "blitz") nextPrompt();
+  paint(); stats();
+}
+document.querySelectorAll(".modes button").forEach(function(b){
+  b.addEventListener("click", function(){ setMode(b.dataset.mode); });
+});
+function restartRun(){ setMode(st.mode); }
+document.getElementById("btn-reset").addEventListener("click", restartRun);
+document.getElementById("btn-restart").addEventListener("click", restartRun);
+document.getElementById("btn-logout").addEventListener("click", function(){
+  me = null; pw = null;
+  try { localStorage.removeItem(LS_USER); localStorage.removeItem(LS_PW); } catch (e) {}
+  document.getElementById("me-name").textContent = "—";
+  document.getElementById("pw").value = "";
+  document.getElementById("gate-err").textContent = "";
+  document.getElementById("gate").hidden = false;
+  setMode("study");
+  syncNote("", "signed out");
+  renderBoard();
+});
+document.querySelector("[data-again]").addEventListener("click", function(){ setMode("blitz"); });
+document.querySelector("[data-study]").addEventListener("click", function(){ setMode("study"); });
+
+/* ---------------- gate ---------------- */
+var sel = document.getElementById("who");
+USERS.forEach(function(u){
+  var o = document.createElement("option");
+  o.value = u; o.textContent = u;
+  sel.appendChild(o);
+});
+function signIn(u, p){
+  me = u; pw = p;
+  document.getElementById("me-name").textContent = u;
+  document.getElementById("gate").hidden = true;
+  ls(LS_USER, u); ls(LS_PW, p);
+  renderBoard();
+  refresh();
+}
+document.getElementById("gate-form").addEventListener("submit", function(e){
+  e.preventDefault();
+  var u = sel.value;
+  var p = document.getElementById("pw").value.trim();
+  var err = document.getElementById("gate-err");
+  var go = document.getElementById("gate-go");
+  err.textContent = ""; go.disabled = true; go.textContent = "Checking…";
+  me = u; pw = p;
+  call("board").then(function(j){
+    go.disabled = false; go.textContent = "Enter the field";
+    if (j && j.ok){ applyBoard(j); signIn(u, p); }
+    else {
+      me = null; pw = null;
+      err.textContent = j && j._status === 401 ? "Wrong password." : "Could not sign you in.";
+      document.getElementById("pw").value = "";
+    }
+  }).catch(function(){
+    /* Can't reach the board - let them in to practise anyway, clearly marked.
+       Runs can't be recorded while offline, so nothing can pollute the board. */
+    go.disabled = false; go.textContent = "Enter the field";
+    syncNote("off", "offline - runs will not count");
+    signIn(u, p);
+  });
+});
+
+/* ---------------- go ---------------- */
+try { scores = normalise(JSON.parse(ls(LS_SCORES) || "{}")); } catch (e) { scores = blank(); }
+drawBoard();
+setMode("study");
+renderBoard();
+syncNote("", "connecting");
+
+var savedU = ls(LS_USER), savedP = ls(LS_PW);
+if (savedU && USERS.indexOf(savedU) >= 0 && savedP) signIn(savedU, savedP);  /* locked in */
+setInterval(function(){ if (me && st.mode !== "blitz") refresh(); }, 45000);
+})();
+</script>
+
+</body>
+</html>
